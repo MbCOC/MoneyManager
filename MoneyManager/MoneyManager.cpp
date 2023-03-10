@@ -250,8 +250,8 @@ int main()
 				isOpen = false;
 				system("cls");
 				showMassage("Application closed successful\n", "green");
-				return EXIT_SUCCESS;
 				delete user;
+				return EXIT_SUCCESS;
 				break;
 			case 1:
 				std::cout << "\nEnter your id: ";
