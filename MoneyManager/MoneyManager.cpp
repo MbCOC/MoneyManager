@@ -10,9 +10,9 @@ int main()
 	bool isOpen = true;
 	bool isAccountVerified = false;
 	Account *user = new Account();
-	/*int startUserId = 26022008;							//---Test user id
-	std::string startUserPassword = "dr26022008";					//---Test user password
-	float startUserMoney = 500.0f;							//---Test user moneyAmount
+	/*int startUserId = 111111;							//---Test user id
+	std::string startUserPassword = "userPass";					//---Test user password
+	float startUserMoney = 200.0f;							//---Test user moneyAmount
 	Account *user = new Account(startUserId, startUserPassword, startUserMoney);	//---Test user account*/
 	//---Draw new interface
 	while (isOpen)
