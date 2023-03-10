@@ -1,8 +1,4 @@
-﻿#include <iostream>
-#include <windows.h>
-#include <string>
-#include <vector>
-#include <iomanip>
+#include <iostream>
 
 #include "CoreFunctions.h"
 #include "Account.h"
@@ -12,9 +8,12 @@
 int main()
 {
 	bool isOpen = true;
-	bool isAccountVerified = false;
-	Account user;
-	//Account user = Account(111111, "account2000", 500.0f); //---Test user account
+	bool isAccountVerified = true;
+	//Account *user = new Account();
+	int startUserId = 26022008;													//---Test user id
+	std::string startUserPassword = "dr26022008";								//---Test user password
+	float startUserMoney = 500.0f;												//---Test user moneyAmount
+	Account *user = new Account(startUserId, startUserPassword, startUserMoney);//---Test user account
 	//---Draw new interface
 	while (isOpen)
 	{
@@ -49,9 +48,9 @@ int main()
 			float newMoneyAmount;
 
 			float profitValue;
-			std::string profitCategorie;
+			std::string profitCategory;
 			float expenseValue;
-			std::string expenseCategorie;
+			std::string expenseCategory;
 			//---Check chosen option
 			switch (chosenOption)
 			{
@@ -61,19 +60,20 @@ int main()
 				isOpen = false;
 				system("cls");
 				showMassage("Application closed successful\n", "green");
+				delete user;
 				return EXIT_SUCCESS;
 				break;
 			case 1:
 				std::cout << "\nYour id is: ";
-				showMassage(std::to_string(user.getId()), "yellow");
+				showMassage(std::to_string(user->getId()), "yellow");
 				break;
 			case 2:
 				std::cout << "\nYour password is: ";
-				showMassage(user.getPassword(), "yellow");
+				showMassage(user->getPassword(), "yellow");
 				break;
 			case 3:
 				std::cout << "\nYour money balance ($): ";
-				showFloat(user.moneyAmount, "yellow");
+				showFloat(user->moneyAmount, "yellow");
 				break;
 			case 4:
 				showMassage("\nChange password:\n", "green");
@@ -82,7 +82,7 @@ int main()
 				newPassword = checkInputStr();
 				setTextColor();
 
-				if (newPassword == user.getPassword())
+				if (newPassword == user->getPassword())
 				{
 					showError("the new password can't be the same as the current password");
 					break;
@@ -105,7 +105,7 @@ int main()
 				}
 				else
 				{
-					user.setPassword(newPassword);
+					user->setPassword(newPassword);
 					showMassage("\nPassword changed successful", "green");
 					isAccountVerified = false;
 				}
@@ -126,7 +126,7 @@ int main()
 					}
 				}
 
-				user.moneyAmount = newMoneyAmount;
+				user->moneyAmount = newMoneyAmount;
 				showMassage("\nMoney amount changed successful", "green");
 				break;
 			case 6:
@@ -151,15 +151,15 @@ int main()
 						break;
 					}
 
-					std::cout << "Enter a profit categorie: ";
+					std::cout << "Enter a profit category: ";
 					setTextColor("yellow");
-					profitCategorie = checkInputStr();
+					profitCategory = checkInputStr();
 					setTextColor();
 
-					user.moneyAmount += profitValue;
-					user.history.push_back(History(profitValue, profitCategorie));
+					user->moneyAmount += profitValue;
+					user->history.push_back(History(profitValue, profitCategory, "profit"));
 					showMassage("Your money amount now is ($): ");
-					showFloat(user.moneyAmount, "yellow");
+					showFloat(user->moneyAmount, "yellow");
 					break;
 				case 2:
 					std::cout << "Enter an expense value ($): ";
@@ -173,15 +173,21 @@ int main()
 						break;
 					}
 
-					std::cout << "Enter an expense categorie: ";
-					setTextColor("yellow");
-					expenseCategorie = checkInputStr();
-					setTextColor();
+					if (expenseValue > user->moneyAmount)
+					{
+						showError("expense value can't be bigger then current money amount");
+						break;
+					}
 
-					user.moneyAmount -= expenseValue;
-					user.history.push_back(History(-expenseValue, expenseCategorie));
+					std::cout << "Enter an expense category: ";
+					setTextColor("yellow");
+					expenseCategory = checkInputStr();
+					setTextColor();
+					
+					user->moneyAmount -= expenseValue;
+					user->history.push_back(History(expenseValue, expenseCategory, "expense"));
 					showMassage("Your money amount now is ($): ");
-					showFloat(user.moneyAmount, "yellow");
+					showFloat(user->moneyAmount, "yellow");
 					break;
 				default:
 					showError("unavailable option\n");
@@ -190,52 +196,51 @@ int main()
 
 				break;
 			case 7:
-				if (user.history.empty())
+				if (user->history.empty())
 				{
 					showMassage("\nHistory is clear", "green");
 				}
 				else
 				{
 					std::cout << "User ";
-					showMassage(std::to_string(user.getId()), "green");
+					showMassage(std::to_string(user->getId()), "green");
 					std::cout << "'s history:\n\n";
 
-					for (int i = 0; i < user.history.size(); i++)
+					for (int i = 0; i < user->history.size(); i++)
 					{
-						std::cout << "Categorie: \"";
-						showMassage(user.history.at(i).savedCatigorie + "\"", "yellow");
-						std::cout << " | Value: \"";
+						std::cout << "Category: ";
+						showMassage('\"' + user->history.at(i).savedCatigorie + '\"', "yellow");
+						std::cout << " | Value: ";
 
-						if (user.history.at(i).savedValue < 0)
+						if (user->history.at(i).savedType == "profit")
 						{
-							showFloat(user.history.at(i).savedValue, "red");
+							showFloat(user->history.at(i).savedValue, "green");
 						}
 						else
 						{
-							showFloat(user.history.at(i).savedValue, "green");
+							showFloat(-user->history.at(i).savedValue, "red");
 						}
 
-						std::cout << "\"\n";
+						std::cout << std::endl;
 					}
 				}
 
 				break;
 			case 8:
-				user.clearHistory();
+				user->history.clear();
 				showMassage("\nHistory cleared", "green");
 				break;
 			default:
 				showError("unavailable option\n");
 				break;
 			}
-
 			checkEnterKey();
 		}
 		else
 		{
-			int signinId, signupId;
+			int signInId, signUpId;
 			float moneyAmount;
-			std::string signinPassword, signupPassword;
+			std::string signInPassword, signUpPassword;
 			//---Check chosen option
 			switch (chosenOption)
 			{
@@ -246,19 +251,20 @@ int main()
 				system("cls");
 				showMassage("Application closed successful\n", "green");
 				return EXIT_SUCCESS;
+				delete user;
 				break;
 			case 1:
 				std::cout << "\nEnter your id: ";
 				setTextColor("yellow");
-				signinId = checkInputInt();
+				signInId = checkInputInt();
 				setTextColor();
 
-				if (signinId == -1 || signinId < 10000) {
-					if (signinId == -1)
+				if (signInId == -1 || signInId < 10000) {
+					if (signInId == -1)
 					{
 						break;
 					}
-					else if (signinId < 10000)
+					else if (signInId < 10000)
 					{
 						showError("Account id is too short");
 						break;
@@ -267,31 +273,31 @@ int main()
 
 				std::cout << "Enter your password: ";
 				setTextColor("yellow");
-				signinPassword = checkInputStr();
+				signInPassword = checkInputStr();
 				setTextColor();
 
-				if (signinPassword.length() < 5)
+				if (signInPassword.length() < 5)
 				{
 					showError("password is too short");
 					break;
 				}
 
-				if (signinId == user.getId() && signinPassword == user.getPassword())
+				if (signInId == user->getId() && signInPassword == user->getPassword())
 				{
 					showMassage("\nSigned in successful\n", "green");
 					isAccountVerified = true;
 				}
-				else if (signinId != user.getId() && signinPassword != user.getPassword())
+				else if (signInId != user->getId() && signInPassword != user->getPassword())
 				{
 					showError("uncorrect id and password");
 					break;
 				}
-				else if (signinId != user.getId())
+				else if (signInId != user->getId())
 				{
 					showError("uncorrect id");
 					break;
 				}
-				else if (signinPassword != user.getPassword())
+				else if (signInPassword != user->getPassword())
 				{
 					showError("uncorrect password");
 					break;
@@ -303,15 +309,15 @@ int main()
 				std::cout << "Enter a new account id: ";
 
 				setTextColor("yellow");
-				signupId = checkInputInt();
+				signUpId = checkInputInt();
 				setTextColor();
 
-				if (signupId == -1 || signupId < 10000) {
-					if (signupId == -1)
+				if (signUpId == -1 || signUpId < 10000) {
+					if (signUpId == -1)
 					{
 						showError("uncorrect input");
 					}
-					else if (signupId < 10000)
+					else if (signUpId < 10000)
 					{
 						showError("new account id is too short");
 					}
@@ -320,10 +326,10 @@ int main()
 
 				std::cout << "Enter a new account password: ";
 				setTextColor("yellow");
-				signupPassword = checkInputStr();
+				signUpPassword = checkInputStr();
 				setTextColor();
 
-				if (signupPassword.length() < 5)
+				if (signUpPassword.length() < 5)
 				{
 					showError("new password is too short");
 					break;
@@ -334,27 +340,20 @@ int main()
 				moneyAmount = checkInputFloat();
 				setTextColor();
 
-				if (moneyAmount == -1 || moneyAmount < 0.0f)
+				if (moneyAmount < 0.0f)
 				{
-					if (moneyAmount == -1)
-					{
-						break;
-					}
-					else if (moneyAmount < 0.0f)
-					{
-						showError("money amount can't be less then 0");
-						break;
-					}
+					showError("money amount can't be less then 0");
+					break;
 				}
 
-				if (signupId == user.getId())
+				if (signUpId == user->getId())
 				{
 					showError("an account with this id already exists");
 					break;
 				}
 				else
 				{
-					user = Account(signupId, signupPassword, moneyAmount);
+					user = new Account(signUpId, signUpPassword, moneyAmount);
 					showMassage("\nAccount created successful\n", "green");
 				}
 
@@ -368,5 +367,6 @@ int main()
 		}
 	}
 	
+	delete user;
 	return EXIT_SUCCESS;
 }
