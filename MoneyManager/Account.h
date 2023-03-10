@@ -23,18 +23,13 @@ public:
 		userPassword = newPassword;
 	}
 
-	void clearHistory()
-	{
-		history.clear();
-	}
-
 	Account()
 	{
 		userId = -1;
 		userPassword = "";
 		moneyAmount = 0.0f;
 	}
-	Account(int newId, std::string newPassword, float newMoneyAmount)
+	Account(int& newId, std::string& newPassword, float& newMoneyAmount)
 	{
 		userId = newId;
 		userPassword = newPassword;
