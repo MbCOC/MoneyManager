@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <iomanip>
+#include <stdexcept>
 
 void checkEnterKey() {
 	std::cin.get();
@@ -68,12 +69,12 @@ int checkInputInt() {
 	}
 	catch (const std::invalid_argument&)
 	{
-		showError("INVALID ARGUMENT\n");
+		showError("invalid argument\n");
 		return -1;
 	}
 	catch (const std::out_of_range&)
 	{
-		showError("ARGUMENT IS OUT OF THE RANGE\n");
+		showError("argument is out of the range\n");
 		return -1;
 	}
 }
@@ -87,12 +88,12 @@ float checkInputFloat() {
 	}
 	catch (const std::invalid_argument&)
 	{
-		showError("INVALID ARGUMENT\n");
+		showError("invalid argument\n");
 		return -1;
 	}
 	catch (const std::out_of_range&)
 	{
-		showError("ARGUMENT IS OUT OF THE RANGE\n");
+		showError("argument is out of the range\n");
 		return -1;
 	}
 }
