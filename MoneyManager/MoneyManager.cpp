@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "CoreFunctions.h"
 #include "Account.h"
@@ -8,19 +9,21 @@
 int main()
 {
 	bool isOpen = true;
-	bool isAccountVerified = false;
 	Account *user = new Account();
-	/*int startUserId = 111111;							//---Test user id
-	std::string startUserPassword = "userPass";					//---Test user password
-	float startUserMoney = 200.0f;							//---Test user moneyAmount
-	Account *user = new Account(startUserId, startUserPassword, startUserMoney);	//---Test user account*/
+
+	/*int startUserId = 26022008;													//---Test user id
+	std::string startUserPassword = "dr26022008";									//---Test user password
+	float startUserMoney = 500.0f;													//---Test user money amount
+	Account *user = new Account(startUserId, startUserPassword, startUserMoney);	//---Test user account
+	user->isVerified = true;*/														//---Test user verify
+	
 	//---Draw new interface
 	while (isOpen)
 	{
 		showMassage("MONEY MANAGER", "yellow");
-		std::cout << "\t\tSTATUS: ";
+		std::cout << "\t\t\t\tSTATUS: ";
 		//---Show options
-		if (isAccountVerified)
+		if (user->isVerified)
 		{
 			showMassage("VERIFIED\n", "green");
 			showMassage("Options: ", "green");
@@ -41,7 +44,7 @@ int main()
 		chosenOption = checkInputInt();
 		setTextColor();
 		//---Verification check
-		if (isAccountVerified)
+		if (user->isVerified)
 		{
 			std::string newPassword;
 			std::string newPasswordCheck;
@@ -54,8 +57,6 @@ int main()
 			//---Check chosen option
 			switch (chosenOption)
 			{
-			case -1:
-				break;
 			case 0:
 				isOpen = false;
 				system("cls");
@@ -107,7 +108,7 @@ int main()
 				{
 					user->setPassword(newPassword);
 					showMassage("\nPassword changed successful", "green");
-					isAccountVerified = false;
+					user->isVerified = false;
 				}
 				break;
 			case 5:
@@ -209,16 +210,16 @@ int main()
 					for (int i = 0; i < user->history.size(); i++)
 					{
 						std::cout << "Category: ";
-						showMassage('\"' + user->history.at(i).savedCatigorie + '\"', "yellow");
+						showMassage('\"' + user->history.at(i).getCategory() + '\"', "yellow");
 						std::cout << " | Value: ";
 
-						if (user->history.at(i).savedType == "profit")
+						if (user->history.at(i).getType() == "profit")
 						{
-							showFloat(user->history.at(i).savedValue, "green");
+							showFloat(user->history.at(i).getValue(), "green");
 						}
 						else
 						{
-							showFloat(-user->history.at(i).savedValue, "red");
+							showFloat(-user->history.at(i).getValue(), "red");
 						}
 
 						std::cout << std::endl;
@@ -229,6 +230,9 @@ int main()
 			case 8:
 				user->history.clear();
 				showMassage("\nHistory cleared", "green");
+				break;
+			case 9:
+				user->isVerified = false;
 				break;
 			default:
 				showError("unavailable option\n");
@@ -244,8 +248,6 @@ int main()
 			//---Check chosen option
 			switch (chosenOption)
 			{
-			case -1:
-				break;
 			case 0:
 				isOpen = false;
 				system("cls");
@@ -259,16 +261,22 @@ int main()
 				signInId = checkInputInt();
 				setTextColor();
 
-				if (signInId == -1 || signInId < 10000) {
-					if (signInId == -1)
+				if (signInId < 10000)
+				{
+					if (signInId < -1)
 					{
+						showError("Account id can't be less then 0");
 						break;
 					}
-					else if (signInId < 10000)
-					{
-						showError("Account id is too short");
-						break;
-					}
+
+					showError("Account id is too short");
+					break;
+				}
+
+				if (signInId != user->getId())
+				{
+					showError("uncorrect id");
+					break;
 				}
 
 				std::cout << "Enter your password: ";
@@ -282,27 +290,14 @@ int main()
 					break;
 				}
 
-				if (signInId == user->getId() && signInPassword == user->getPassword())
-				{
-					showMassage("\nSigned in successful\n", "green");
-					isAccountVerified = true;
-				}
-				else if (signInId != user->getId() && signInPassword != user->getPassword())
-				{
-					showError("uncorrect id and password");
-					break;
-				}
-				else if (signInId != user->getId())
-				{
-					showError("uncorrect id");
-					break;
-				}
-				else if (signInPassword != user->getPassword())
+				if (signInPassword != user->getPassword())
 				{
 					showError("uncorrect password");
 					break;
 				}
 
+				user->isVerified = true;
+				showMassage("\nAccount verified successful", "green");
 				break;
 			case 2:
 				showMassage("\nCreate a new account:\n", "yellow");
@@ -312,15 +307,21 @@ int main()
 				signUpId = checkInputInt();
 				setTextColor();
 
-				if (signUpId == -1 || signUpId < 10000) {
-					if (signUpId == -1)
+				if (signUpId < 10000)
+				{
+					if (signUpId < -1)
 					{
-						showError("uncorrect input");
+						showError("Account id can't be less then 0");
+						break;
 					}
-					else if (signUpId < 10000)
-					{
-						showError("new account id is too short");
-					}
+
+					showError("new account id is too short");
+					break;
+				}
+
+				if (signUpId == user->getId())
+				{
+					showError("an account with this id already exists");
 					break;
 				}
 
@@ -345,17 +346,9 @@ int main()
 					showError("money amount can't be less then 0");
 					break;
 				}
-
-				if (signUpId == user->getId())
-				{
-					showError("an account with this id already exists");
-					break;
-				}
-				else
-				{
-					user = new Account(signUpId, signUpPassword, moneyAmount);
-					showMassage("\nAccount created successful\n", "green");
-				}
+				
+				user = new Account(signUpId, signUpPassword, moneyAmount);
+				showMassage("\nAccount created successful\n", "green");
 
 				break;
 			default:
