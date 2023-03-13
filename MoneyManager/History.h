@@ -4,16 +4,32 @@
 
 class History
 {
+private:
+	float value;
+	std::string category;
+	std::string type;
+
 public:
-	float savedValue;
-	std::string savedCatigorie;
-	std::string savedType;
+	float getValue()
+	{
+		return value;
+	}
+
+	std::string getCategory()
+	{
+		return category;
+	}
+
+	std::string getType()
+	{
+		return type;
+	}
 
 	History();
-	History(float& newValue, std::string& newCatigorie, std::string newType)
+	History(float& newValue, std::string& newCategory, std::string newType)
 	{
-		savedValue = newValue;
-		savedCatigorie = newCatigorie;
-		savedType = newType;
+		value = newValue;
+		category = newCategory;
+		type = newType;
 	}
 };
