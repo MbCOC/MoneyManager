@@ -5,9 +5,10 @@
 class Account
 {
 public:
+	bool isVerified;
 	float moneyAmount;
 	std::vector<History> history;
-
+	
 	int getId()
 	{
 		return userId;
@@ -18,19 +19,21 @@ public:
 		return userPassword;
 	}
 
-	void setPassword(std::string newPassword)
+	void setPassword(std::string& newPassword)
 	{
 		userPassword = newPassword;
 	}
 
 	Account()
 	{
+		isVerified = false;
 		userId = -1;
 		userPassword = "";
 		moneyAmount = 0.0f;
 	}
 	Account(int& newId, std::string& newPassword, float& newMoneyAmount)
 	{
+		isVerified = false;
 		userId = newId;
 		userPassword = newPassword;
 		moneyAmount = newMoneyAmount;
